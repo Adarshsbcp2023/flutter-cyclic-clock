@@ -47,7 +47,7 @@ class TimeUtils {
     }
 
     // Find next matching weekday (0=Mon in our list, DateTime.weekday: 1=Mon, 7=Sun)
-    for (int offset = 0; offset < 8; offset++) {
+    for (int offset = 0; offset < 7; offset++) {
       final candidate =
           DateTime(now.year, now.month, now.day + offset, hour, minute);
       final weekdayIndex = candidate.weekday - 1; // 0=Mon

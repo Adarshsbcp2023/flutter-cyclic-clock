@@ -45,6 +45,36 @@ void alarmCallback(int id) async {
     'Time to wake up!',
     const NotificationDetails(android: androidDetails),
   );
+
+  // Reschedule for the next occurrence if this is a recurring alarm.
+  final hasRepeat = alarm.repeatDays.any((d) => d);
+  if (hasRepeat) {
+    final nextTime = _nextOccurrence(alarm.hour, alarm.minute, alarm.repeatDays);
+    if (nextTime != null) {
+      await AndroidAlarmManager.oneShotAt(
+        nextTime,
+        id,
+        alarmCallback,
+        exact: true,
+        wakeup: true,
+        rescheduleOnReboot: true,
+        allowWhileIdle: true,
+      );
+    }
+  }
+}
+
+/// Returns the next DateTime (strictly after [now]) for the given time and
+/// repeat-day mask without going further than 7 days ahead.
+DateTime? _nextOccurrence(int hour, int minute, List<bool> repeatDays) {
+  final now = DateTime.now();
+  for (int offset = 1; offset <= 7; offset++) {
+    final candidate =
+        DateTime(now.year, now.month, now.day + offset, hour, minute);
+    final weekdayIndex = candidate.weekday - 1; // 0 = Monday
+    if (repeatDays[weekdayIndex]) return candidate;
+  }
+  return null;
 }
 
 class AlarmService {

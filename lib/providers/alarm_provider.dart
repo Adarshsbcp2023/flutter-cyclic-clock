@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
 import '../models/alarm.dart';
 import '../database/database_helper.dart';
 import '../services/alarm_service.dart';
@@ -21,10 +20,11 @@ class AlarmProvider extends ChangeNotifier {
   }
 
   Future<void> addAlarm(Alarm alarm) async {
-    final newAlarm = alarm.copyWith(id: const Uuid().v4());
-    await _db.insertAlarm(newAlarm);
-    _alarms.add(newAlarm);
-    await AlarmService.scheduleAlarm(newAlarm);
+    // Callers are responsible for providing a unique ID; preserve it so that
+    // "undo delete" operations restore the alarm with its original identity.
+    await _db.insertAlarm(alarm);
+    _alarms.add(alarm);
+    await AlarmService.scheduleAlarm(alarm);
     notifyListeners();
   }
 

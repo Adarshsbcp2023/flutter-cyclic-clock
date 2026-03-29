@@ -3,18 +3,17 @@ import 'package:permission_handler/permission_handler.dart';
 
 class PermissionUtils {
   static Future<bool> requestAlarmPermissions(BuildContext context) async {
-    final permissions = [
-      Permission.notification,
-      Permission.scheduleExactAlarm,
-    ];
-
     bool allGranted = true;
-    for (final permission in permissions) {
-      final status = await permission.request();
-      if (!status.isGranted) {
-        allGranted = false;
-      }
-    }
+
+    // POST_NOTIFICATIONS is required on Android 13+ (API 33+).
+    final notifStatus = await Permission.notification.request();
+    if (!notifStatus.isGranted) allGranted = false;
+
+    // SCHEDULE_EXACT_ALARM is required on API 31-32; USE_EXACT_ALARM (API 33+)
+    // is automatically granted for alarm-clock apps so no runtime request needed.
+    final exactAlarmStatus = await Permission.scheduleExactAlarm.request();
+    if (!exactAlarmStatus.isGranted) allGranted = false;
+
     return allGranted;
   }
 

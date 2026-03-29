@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/alarm_provider.dart';
 import '../providers/playlist_provider.dart';
 import '../services/audio_service.dart';
@@ -89,24 +92,35 @@ class _WakeUpScreenState extends State<WakeUpScreen>
     _pulseController.stop();
     _clockTimer?.cancel();
 
-    final snoozeMinutes = _alarm?.snoozeMinutes ?? 5;
-    final snoozeTime =
-        DateTime.now().add(Duration(minutes: snoozeMinutes));
-
+    // Schedule a one-off snooze alarm using a separate ID so the original
+    // recurring alarm (if any) remains unaffected.
     if (_alarm != null) {
-      final snoozeAlarm = _alarm!.copyWith(
-        nextAlarmTime: snoozeTime,
-        repeatDays: List.filled(7, false),
+      final snoozeMinutes = _alarm!.snoozeMinutes;
+      final snoozeTime =
+          DateTime.now().add(Duration(minutes: snoozeMinutes));
+      // Derive a stable snooze-alarm ID from the original, guaranteed different.
+      final snoozeId =
+          ('${_alarm!.id}_snooze').hashCode.abs() % 2147483647;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          '${_alarm!.id}_snooze_data', jsonEncode(_alarm!.toMap()));
+      await AndroidAlarmManager.oneShotAt(
+        snoozeTime,
+        snoozeId,
+        alarmCallback,
+        exact: true,
+        wakeup: true,
+        rescheduleOnReboot: false,
+        allowWhileIdle: true,
       );
-      await AlarmService.scheduleAlarm(snoozeAlarm);
     }
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text('Snoozed for ${_alarm?.snoozeMinutes ?? 5} minutes'),
+          content: Text(
+              'Snoozed for ${_alarm?.snoozeMinutes ?? 5} minutes'),
         ),
       );
       Navigator.of(context).pop();
