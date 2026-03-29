@@ -66,6 +66,8 @@ void main() {
       }
       // Should never return the previous index (0).
       expect(results.contains(0), isFalse);
+      // Should produce more than one distinct result (truly random across indices 1 & 2).
+      expect(results.length, greaterThan(1));
     });
 
     test('returns 0 for single-track playlist', () async {

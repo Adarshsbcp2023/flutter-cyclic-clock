@@ -10,7 +10,7 @@ class DaySelector extends StatelessWidget {
     required this.onChanged,
   });
 
-  static const _labels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  static const _labels = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'];
   static const _fullLabels = [
     'Monday',
     'Tuesday',

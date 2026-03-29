@@ -1,3 +1,7 @@
+/// Sentinel date used to mark a playlist that has never been shuffled.
+/// Using epoch (0 ms) makes the intent explicit: any real date is after this.
+final _kNeverShuffled = DateTime.fromMillisecondsSinceEpoch(0);
+
 class Track {
   final String path;
   final String name;
@@ -60,7 +64,7 @@ class CyclicPlaylist {
       currentIndex: map['currentIndex'] as int? ?? 0,
       lastShuffledDate:
           DateTime.tryParse(map['lastShuffledDate'] as String? ?? '') ??
-              DateTime(2000),
+              _kNeverShuffled,
     );
   }
 

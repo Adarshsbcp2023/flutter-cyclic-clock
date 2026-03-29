@@ -26,7 +26,9 @@ class PlaylistProvider extends ChangeNotifier {
       name: name,
       trackPaths: [],
       currentIndex: 0,
-      lastShuffledDate: DateTime(2000),
+      // Epoch sentinel: treated as "never shuffled" so the first alarm fire
+      // will always pick a fresh random track.
+      lastShuffledDate: DateTime.fromMillisecondsSinceEpoch(0),
     );
     await _db.insertPlaylist(playlist);
     _playlists.add(playlist);

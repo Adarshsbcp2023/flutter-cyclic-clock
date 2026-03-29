@@ -11,6 +11,7 @@ import 'screens/alarm_editor_screen.dart';
 import 'screens/music_selector_screen.dart';
 import 'screens/wake_up_screen.dart';
 import 'models/cyclic_playlist.dart';
+import 'services/alarm_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ Future<void> main() async {
   );
 
   await AndroidAlarmManager.initialize();
+  await AlarmService.initialize();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),

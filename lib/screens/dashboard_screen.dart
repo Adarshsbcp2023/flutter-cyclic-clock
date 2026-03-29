@@ -2,11 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/alarm_provider.dart';
 import '../models/alarm.dart';
+import '../utils/permission_utils.dart';
 import '../widgets/alarm_card.dart';
 import 'alarm_editor_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PermissionUtils.checkAndRequestAll(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

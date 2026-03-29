@@ -65,14 +65,14 @@ void alarmCallback(int id) async {
 }
 
 /// Returns the next DateTime (strictly after [now]) for the given time and
-/// repeat-day mask without going further than 7 days ahead.
+/// repeat-day mask, searching up to 14 days ahead.
 DateTime? _nextOccurrence(int hour, int minute, List<bool> repeatDays) {
   final now = DateTime.now();
-  for (int offset = 1; offset <= 7; offset++) {
+  for (int offset = 0; offset <= 13; offset++) {
     final candidate =
         DateTime(now.year, now.month, now.day + offset, hour, minute);
     final weekdayIndex = candidate.weekday - 1; // 0 = Monday
-    if (repeatDays[weekdayIndex]) return candidate;
+    if (repeatDays[weekdayIndex] && candidate.isAfter(now)) return candidate;
   }
   return null;
 }

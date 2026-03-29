@@ -102,8 +102,9 @@ class _WakeUpScreenState extends State<WakeUpScreen>
       final snoozeId =
           ('${_alarm!.id}_snooze').hashCode.abs() % 2147483647;
       final prefs = await SharedPreferences.getInstance();
+      // Store with the same key format that alarmCallback reads: 'alarm_data_${id}'
       await prefs.setString(
-          '${_alarm!.id}_snooze_data', jsonEncode(_alarm!.toMap()));
+          'alarm_data_$snoozeId', jsonEncode(_alarm!.toMap()));
       await AndroidAlarmManager.oneShotAt(
         snoozeTime,
         snoozeId,

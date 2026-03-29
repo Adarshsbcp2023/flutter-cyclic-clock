@@ -46,13 +46,15 @@ class TimeUtils {
       return today.add(const Duration(days: 1));
     }
 
-    // Find next matching weekday (0=Mon in our list, DateTime.weekday: 1=Mon, 7=Sun)
-    for (int offset = 0; offset < 7; offset++) {
+    // Find next matching weekday (0=Mon in our list, DateTime.weekday: 1=Mon, 7=Sun).
+    // Check up to 14 days ahead so we always find the next repeat occurrence even
+    // if the matching day has already passed today.
+    for (int offset = 0; offset <= 13; offset++) {
       final candidate =
           DateTime(now.year, now.month, now.day + offset, hour, minute);
       final weekdayIndex = candidate.weekday - 1; // 0=Mon
-      if (repeatDays[weekdayIndex]) {
-        if (candidate.isAfter(now)) return candidate;
+      if (repeatDays[weekdayIndex] && candidate.isAfter(now)) {
+        return candidate;
       }
     }
     return null;
